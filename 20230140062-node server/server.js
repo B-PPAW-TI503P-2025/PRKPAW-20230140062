@@ -2,6 +2,7 @@
  const cors = require('cors'); 
  const app = express();
  const PORT = 3001;
+ const bookRoutes = require('./routes/books');
  
  // Middleware
  app.use(cors()); 
@@ -18,3 +19,5 @@
  app.listen(PORT, () => {
    console.log(`Express server running at http://localhost:${PORT}/`);
  });
+
+app.use('/api/books', bookRoutes);
