@@ -18,12 +18,12 @@ module.exports = {
         allowNull: false
       },
       checkIn: {
-        type: Sequelize.DATE,
-        allowNull: false
+        allowNull: false,
+        type: Sequelize.DATE
       },
       checkOut: {
-        type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true, // checkOut bisa kosong saat pertama kali check-in
+        type: Sequelize.DATE
       },
       createdAt: {
         allowNull: false,
