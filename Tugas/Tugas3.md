@@ -1,5 +1,12 @@
+# Tugas 3
+
+Reports endpoint
 ![/reports/daily](<ss/Screenshot 2025-10-23 213525.png>)
+
+Check-in endpoint (1x & 2x)
 ![Check-in 1x](<ss/Screenshot 2025-10-23 213902.png>)
 ![Check-in 2x](<ss/Screenshot 2025-10-23 214255.png>)
+
+Check-out endpoint (1x & 2x)
 ![Check-out 1x](<ss/Screenshot 2025-10-23 213918.png>)
 ![Check-out 2x](<ss/Screenshot 2025-10-23 214315.png>)
