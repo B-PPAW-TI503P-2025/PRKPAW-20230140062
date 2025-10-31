@@ -1,45 +1,26 @@
 const { Presensi } = require('../models');
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 const { format } = require('date-fns-tz');
 const timeZone = "Asia/Jakarta";
 
 exports.getDailyReport = async (req, res) => {
     try {
         const today = new Date();
+        const { nama } = req.query;
+        let options = { where: {} };
 
-        const startOfDay = new Date(today.setHours(0, 0, 0, 0));
-        const endOfDay = new Date(today.setHours(23, 59, 59, 999));
-
-        const dailyRecords = await Presensi.findAll({
-            where: {
-                checkIn: {
-                    [Op.between]: [startOfDay, endOfDay]
-                }
-            },
-            order: [['checkIn', 'DESC']]
-        });
-
-        if (dailyRecords.length === 0) {
-            return res.status(200).json({ 
-                message: "Tidak ada catatan presensi hari ini.",
-                data: []
-            });
+        if (nama) {
+            options.where.nama = {
+                [Op.like]: `%${nama}%`
+            };
         }
 
-        const formattedReport = dailyRecords.map(record => ({
-            userId: record.userId,
-            nama: record.nama,
-            checkIn: format(record.checkIn, "yyyy-MM-dd HH:mm:ss", { timeZone }),
-            checkOut: record.checkOut ? format(record.checkOut, "yyyy-MM-dd HH:mm:ss", { timeZone }) : 'N/A'
-        }));
+        const records = await Presensi.findAll(options);
 
-        res.status(200).json({
-            message: `Laporan presensi untuk tanggal ${format(today, "yyyy-MM-dd", { timeZone })} berhasil diambil.`,
-            count: formattedReport.length,
-            data: formattedReport
+        res.json({
+            reportDate: new Date().toLocaleString(), data: records,
         });
     } catch (error) {
-        console.error('Error fetching daily report:', error);
-        res.status(500).json({ message: "Terjadi kesalahan saat mengambil laporan.", error: error.message });
+        res.status(500).json({ message: "Terjadi kesalahan pada server", error: error.message });
     }
 };
