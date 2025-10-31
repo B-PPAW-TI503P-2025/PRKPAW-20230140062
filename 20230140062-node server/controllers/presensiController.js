@@ -111,7 +111,7 @@ exports.deletePresensi = async (req, res) => {
 exports.updatePresensi = async (req, res) => {
   try {
     const presensiId = req.params.id;
-    const { checkIn, checkOut } = req.body;
+    const { checkIn, checkOut, nama } = req.body;
     if (checkIn === undefined && checkOut === undefined && nama === undefined) {
       return res.status(400).json({ message: "Tidak ada data yang diberikan untuk diperbarui (checkIn, checkOut, atau nama)" });
   }
