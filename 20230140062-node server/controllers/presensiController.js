@@ -2,6 +2,7 @@
  const { Presensi } = require("../models");
  const { format } = require("date-fns-tz");
  const timeZone = "Asia/Jakarta";
+ const { validationResult } = require('express-validator');
  
  exports.CheckIn = async (req, res) => {
    // 2. Gunakan try...catch untuk error handling
@@ -110,11 +111,19 @@ exports.deletePresensi = async (req, res) => {
 
 exports.updatePresensi = async (req, res) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        message: "Validasi Input Gagal",
+        errors: errors.array()
+      })
+    }
+
     const presensiId = req.params.id;
     const { checkIn, checkOut, nama } = req.body;
     if (checkIn === undefined && checkOut === undefined && nama === undefined) {
       return res.status(400).json({ message: "Tidak ada data yang diberikan untuk diperbarui (checkIn, checkOut, atau nama)" });
-  }
+    }
   const recordToUpdate = await Presensi.findByPk(presensiId);
     if (!recordToUpdate) {
       return res.status(404).json({ message: "Catatan presensi tidak ditemukan" });
