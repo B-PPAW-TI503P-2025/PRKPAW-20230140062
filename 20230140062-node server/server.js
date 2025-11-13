@@ -6,6 +6,7 @@ const morgan = require("morgan");
 const ruteBuku = require('./routes/books');
 const presensiRoutes = require("./routes/presensi");
 const reportRoutes = require("./routes/reports");
+const authRoutes = require('./routes/auth');
  
  // Middleware
 app.use(cors());
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
 app.use("/api/books", ruteBuku);
 app.use("/api/presensi", presensiRoutes);
 app.use("/api/reports", reportRoutes);
+app.use('/api/auth', authRoutes);
  
  app.listen(PORT, () => {
    console.log(`Express server running at http://localhost:${PORT}/`);
