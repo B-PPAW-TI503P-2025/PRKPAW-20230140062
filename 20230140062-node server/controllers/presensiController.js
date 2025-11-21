@@ -1,16 +1,13 @@
- // 1. Ganti sumber data dari array ke model Sequelize
  const { Presensi } = require("../models");
  const { format } = require("date-fns-tz");
  const timeZone = "Asia/Jakarta";
  const { validationResult } = require('express-validator');
  
  exports.CheckIn = async (req, res) => {
-   // 2. Gunakan try...catch untuk error handling
    try {
      const { id: userId, nama: userName } = req.user;
      const waktuSekarang = new Date();
  
-     // 3. Ubah cara mencari data menggunakan 'findOne' dari Sequelize
      const existingRecord = await Presensi.findOne({
        where: { userId: userId, checkOut: null },
      });
@@ -21,10 +18,8 @@
          .json({ message: "Anda sudah melakukan check-in hari ini." });
      }
  
-     // 4. Ubah cara membuat data baru menggunakan 'create' dari Sequelize
      const newRecord = await Presensi.create({
        userId: userId,
-       nama: userName,
        checkIn: waktuSekarang,
      });
      
@@ -49,12 +44,10 @@
  };
  
  exports.CheckOut = async (req, res) => {
-   // Gunakan try...catch
    try {
      const { id: userId, nama: userName } = req.user;
      const waktuSekarang = new Date();
  
-     // Cari data di database
      const recordToUpdate = await Presensi.findOne({
        where: { userId: userId, checkOut: null },
      });
@@ -65,7 +58,6 @@
        });
      }
  
-     // 5. Update dan simpan perubahan ke database
      recordToUpdate.checkOut = waktuSekarang;
      await recordToUpdate.save();
  
