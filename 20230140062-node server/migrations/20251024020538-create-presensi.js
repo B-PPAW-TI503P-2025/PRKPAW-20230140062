@@ -18,7 +18,7 @@ module.exports = {
         type: Sequelize.DATE
       },
       checkOut: {
-        allowNull: true, // checkOut bisa kosong saat pertama kali check-in
+        allowNull: true,
         type: Sequelize.DATE
       },
       createdAt: {
@@ -28,6 +28,14 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
+      },
+      latitude: {
+        type: Sequelize.DECIMAL(10, 7),
+        allowNull: true,
+      },
+      longitude: {
+        type: Sequelize.DECIMAL(10, 7),
+        allowNull: true,
       }
     });
   },

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom'; // 1. Tambahkan import Link
 
 function LoginPage() {
   const [email, setEmail] = useState('');
@@ -13,7 +13,6 @@ function LoginPage() {
     setError(null); 
 
     try {
-      
       const response = await axios.post('http://localhost:3001/api/auth/login', {
         email: email,
         password: password
@@ -22,10 +21,12 @@ function LoginPage() {
       const token = response.data.token;
       localStorage.setItem('token', token); 
 
+      // Redirect ke dashboard setelah login sukses
       navigate('/dashboard');
+      // Reload halaman agar Navbar mendeteksi perubahan login
+      window.location.reload(); 
 
     } catch (err) {
-      // 4. Tangani error dari server
       setError(err.response ? err.response.data.message : 'Login gagal');
     }
   };
@@ -76,11 +77,21 @@ function LoginPage() {
             Login
           </button>
         </form>
+
         {error && (
           <p className="text-red-600 text-sm mt-4 text-center">{error}</p>
         )}
+
+        {/* 2. Tambahkan Link ke Halaman Register di sini */}
+        <p className="mt-6 text-center text-sm text-gray-600">
+          Belum punya akun?{' '}
+          <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
+            Daftar di sini
+          </Link>
+        </p>
       </div>
     </div>
   );
 }
-export default LoginPage;
+
+export default LoginPage;  

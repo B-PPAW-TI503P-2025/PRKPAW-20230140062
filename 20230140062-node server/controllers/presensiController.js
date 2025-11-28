@@ -7,6 +7,8 @@
    try {
      const { id: userId, nama: userName } = req.user;
      const waktuSekarang = new Date();
+
+     const { latitude, longitude } = req.body;
  
      const existingRecord = await Presensi.findOne({
        where: { userId: userId, checkOut: null },
@@ -19,13 +21,15 @@
      }
  
      const newRecord = await Presensi.create({
-       userId: userId,
-       checkIn: waktuSekarang,
+      userId: userId,
+      checkIn: waktuSekarang,
+      latitude: latitude || null,
+      longitude: longitude || null,
      });
      
      const formattedData = {
          userId: newRecord.userId,
-         nama: newRecord.nama,
+         nama: userName,
          checkIn: format(newRecord.checkIn, "yyyy-MM-dd HH:mm:ssXXX", { timeZone }),
          checkOut: null
      };
@@ -63,7 +67,7 @@
  
      const formattedData = {
          userId: recordToUpdate.userId,
-         nama: recordToUpdate.nama,
+         nama: userName,
          checkIn: format(recordToUpdate.checkIn, "yyyy-MM-dd HH:mm:ssXXX", { timeZone }),
          checkOut: format(recordToUpdate.checkOut, "yyyy-MM-dd HH:mm:ssXXX", { timeZone }),
      };
@@ -112,9 +116,9 @@ exports.updatePresensi = async (req, res) => {
     }
 
     const presensiId = req.params.id;
-    const { checkIn, checkOut, nama } = req.body;
-    if (checkIn === undefined && checkOut === undefined && nama === undefined) {
-      return res.status(400).json({ message: "Tidak ada data yang diberikan untuk diperbarui (checkIn, checkOut, atau nama)" });
+    const { checkIn, checkOut } = req.body;
+    if (checkIn === undefined && checkOut === undefined) {
+      return res.status(400).json({ message: "Tidak ada data yang diberikan untuk diperbarui (checkIn atau checkOut)" });
     }
   const recordToUpdate = await Presensi.findByPk(presensiId);
     if (!recordToUpdate) {
@@ -123,7 +127,6 @@ exports.updatePresensi = async (req, res) => {
 
     recordToUpdate.checkIn = checkIn || recordToUpdate.checkIn;
     recordToUpdate.checkOut = checkOut || recordToUpdate.checkOut;
-    recordToUpdate.nama = nama || recordToUpdate.nama;
     await recordToUpdate.save();
 
     res.json({ message: "Catatan presensi berhasil diperbarui", data: recordToUpdate });

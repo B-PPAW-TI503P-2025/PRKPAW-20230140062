@@ -1,50 +1,56 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode'; // Requirement B.1
 
-function Navbar() {
-    const navigate = useNavigate();
-    const [user, setUser] = useState({ nama: 'Pengguna', role: 'mahasiswa' });
+const Navbar = () => {
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            try {
-                const decoded = jwtDecode(token);
-                setUser({ nama: decoded.nama, role: decoded.role });
-            } catch (e) {
-                handleLogout();
-            }
-        }
-    }, []);
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setUser(decoded);
+      } catch (error) {
+        console.error("Token invalid");
+      }
+    }
+  }, []);
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        navigate('/login');
-    };
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+    navigate('/login');
+  };
 
-    return (
-        <nav className="bg-indigo-600 p-4 text-white shadow-md">
-            <div className="max-w-6xl mx-auto flex justify-between items-center">
-                <div className="text-lg font-bold">Aplikasi Presensi</div>
-                <div className="flex items-center space-x-4">
-                    <Link to="/dashboard" className="hover:text-gray-300">Dashboard</Link>
-                    <Link to="/presensi" className="hover:text-gray-300">Presensi</Link>
+  if (!user) return null;
 
-                    {user.role === 'admin' && (
-                        <Link to="/reports" className="hover:text-yellow-300 font-semibold">
-                            Laporan Admin
-                        </Link>
-                    )}
+  return (
+    <nav className="bg-blue-600 p-4 text-white flex justify-between items-center">
+      <div className="font-bold text-lg">
+        Sistem Presensi - Halo, {user.nama}
+      </div>
+      <div className="space-x-4">
+        <Link to="/dashboard" className="hover:text-gray-200">Dashboard</Link>
+        <Link to="/presensi" className="hover:text-gray-200">Presensi</Link>
+        
+        {user.role === 'admin' && (
+          <Link to="/reports" className="hover:text-gray-200 bg-blue-800 px-3 py-1 rounded">
+            Laporan Admin
+          </Link>
+        )}
 
-                    <span className="ml-4 font-semibold">Halo, {user.nama} ({user.role})</span>
-                    
-                    <button onClick={handleLogout} className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded-md text-sm">
-                        Logout
-                    </button>
-                </div>
-            </div>
-        </nav>
-    );
-}
+        <button     
+          onClick={handleLogout} 
+          className="bg-red-500 px-3 py-1 rounded hover:bg-red-600"
+        >
+          Logout
+        </button>
+      </div>
+    </nav>
+  );
+};
+
 export default Navbar;
