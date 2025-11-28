@@ -1,5 +1,8 @@
 # Tugas 8
 
+Check-In pada Thunder Client
+![Thunder-Client](ss/image.png)
+
 Check-In
 ![Check-In](ss/Screenshot%202025-11-28%20130702.png)
 
