@@ -4,7 +4,7 @@ const presensiController = require('../controllers/presensiController');
 const { body, validationResult } = require('express-validator');
 const { authenticateToken } = require('../middleware/permissionMiddleware');
 router.use(authenticateToken);
-router.post('/check-in', authenticateToken, presensiController.CheckIn);
+router.post('/check-in', [authenticateToken, presensiController.upload.single('image')], presensiController.CheckIn);
 router.post('/check-out', authenticateToken, presensiController.CheckOut);
 const updateValidationChain = [
     body('checkIn').optional().isISO8601().withMessage('Format checkIn harus berupa tanggal yang valid'),

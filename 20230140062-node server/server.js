@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const path = require('path');
 const app = express();
 const PORT = 3001;
 const morgan = require("morgan");
@@ -39,3 +40,5 @@ app.use((err, req, res, next) => {
         error: err.message 
     });
 });
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
