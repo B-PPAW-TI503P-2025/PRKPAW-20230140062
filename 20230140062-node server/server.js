@@ -1,6 +1,5 @@
 const express = require("express");
 const cors = require("cors");
-const path = require('path');
 const app = express();
 const PORT = 3001;
 const morgan = require("morgan");
@@ -8,6 +7,7 @@ const ruteBuku = require('./routes/books');
 const presensiRoutes = require("./routes/presensi");
 const reportRoutes = require("./routes/reports");
 const authRoutes = require('./routes/auth');
+const path = require('path');
  
  // Middleware
 app.use(cors());

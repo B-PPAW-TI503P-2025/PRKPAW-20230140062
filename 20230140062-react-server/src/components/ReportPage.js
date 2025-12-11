@@ -5,10 +5,11 @@ import { useNavigate } from "react-router-dom";
 function ReportPage() {
   const [reports, setReports] = useState([]);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedImage, setSelectedImage] = useState(null);
 
-  const fetchReports = async (query = "") => {
+  const fetchReports = async (query) => {
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/login");
@@ -20,39 +21,41 @@ function ReportPage() {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        params: {
-            nama: query
-        }
       };
 
-      const response = await axios.get(
-        "http://localhost:3001/api/reports/daily",
-        config
-      );
-      setReports(Array.isArray(response.data) ? response.data : response.data.data || []);
+      const baseUrl = "http://localhost:3001/api/reports/daily";
+      const url = query ? `${baseUrl}?nama=${query}` : baseUrl;
+
+      const response = await axios.get(url, config);
+      setReports(response.data.data);
       setError(null);
     } catch (err) {
-      if (err.response && err.response.status === 403) {
-          setError("Akses ditolak: Anda bukan Admin.");
-      } else {
-          setError("Gagal memuat laporan. Pastikan server berjalan.");
-      }
+      setReports([]);
+      setError(
+        err.response ? err.response.data.message : "Gagal mengambil data"
+      );
     }
   };
 
   useEffect(() => {
-    fetchReports();
+    fetchReports("");
   }, [navigate]);
-
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     fetchReports(searchTerm);
   };
 
+  const getImageUrl = (path) => {
+    if (!path) return null;
+    // Ganti backslash (\) jadi slash (/) jika ada (untuk support path Windows)
+    const cleanPath = path.replace(/\\/g, "/");
+    return `http://localhost:3001/${cleanPath}`;
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-8">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">
-        Laporan Presensi Harian (Admin)
+        Laporan Presensi Harian
       </h1>
 
       <form onSubmit={handleSearchSubmit} className="mb-6 flex space-x-2">
@@ -89,6 +92,18 @@ function ReportPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Check-Out
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Latitude
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Longitude
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Bukti Foto
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Action
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -96,7 +111,7 @@ function ReportPage() {
                 reports.map((presensi) => (
                   <tr key={presensi.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {presensi.User ? presensi.User.nama : "N/A"}
+                      {presensi.user ? presensi.user.nama : "N/A"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {new Date(presensi.checkIn).toLocaleString("id-ID", {
@@ -108,7 +123,78 @@ function ReportPage() {
                         ? new Date(presensi.checkOut).toLocaleString("id-ID", {
                             timeZone: "Asia/Jakarta",
                           })
-                        : <span className="text-yellow-600">Belum Check-Out</span>}
+                        : "Belum Check-Out"}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {presensi.latitude || "N/A"}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {presensi.longitude || "N/A"}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {presensi.buktiFoto ? (
+                        <img
+                          src={getImageUrl(presensi.buktiFoto)}
+                          alt="Bukti"
+                          className="h-10 w-10 rounded-full object-cover cursor-pointer border hover:border-blue-500"
+                          onClick={() =>
+                            setSelectedImage(getImageUrl(presensi.buktiFoto))
+                          }
+                        />
+                      ) : (
+                        <span className="text-xs text-gray-400">Tidak ada</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <div className="mb-2">
+                        <button
+                          onClick={() =>
+                            alert(
+                              `Detail Presensi:\n\nNama: ${
+                                presensi.user ? presensi.user.nama : "N/A"
+                              }\nCheck-In: ${new Date(
+                                presensi.checkIn
+                              ).toLocaleString("id-ID", {
+                                timeZone: "Asia/Jakarta",
+                              })}\nCheck-Out: ${
+                                presensi.checkOut
+                                  ? new Date(presensi.checkOut).toLocaleString(
+                                      "id-ID",
+                                      {
+                                        timeZone: "Asia/Jakarta",
+                                      }
+                                    )
+                                  : "Belum Check-Out"
+                              }\nLatitude: ${
+                                presensi.latitude || "N/A"
+                              }\nLongitude: ${presensi.longitude || "N/A"}`
+                            )
+                          }
+                          className="text-blue-600 hover:text-blue-900 font-semibold"
+                        >
+                          Lihat Detail
+                        </button>
+                      </div>
+                      <div>
+                        <button
+                          onClick={() =>
+                            navigate(`/edit-presensi/${presensi.id}`)
+                          }
+                          className="text-green-600 hover:text-green-900 font-semibold"
+                        >
+                          Edit Presensi
+                        </button>
+                      </div>
+                      <div>
+                        <button
+                          onClick={() =>
+                            navigate(`/delete-presensi/${presensi.id}`)
+                          }
+                          className="text-red-600 hover:text-red-900 font-semibold"
+                        >
+                          Hapus Presensi
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -124,6 +210,28 @@ function ReportPage() {
               )}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {selectedImage && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+          onClick={() => setSelectedImage(null)} // Klik di luar foto untuk tutup
+        >
+          <div className="relative max-w-3xl w-full">
+            <button
+              className="absolute -top-10 right-0 text-white text-xl font-bold hover:text-gray-300"
+              onClick={() => setSelectedImage(null)}
+            >
+              Tutup [X]
+            </button>
+            <img
+              src={selectedImage}
+              alt="Bukti Full"
+              className="w-full h-auto rounded-lg shadow-2xl border-2 border-white"
+              onClick={(e) => e.stopPropagation()} // Mencegah klik foto menutup modal
+            />
+          </div>
         </div>
       )}
     </div>
