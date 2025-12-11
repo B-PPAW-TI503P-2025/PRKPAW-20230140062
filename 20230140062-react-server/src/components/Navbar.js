@@ -60,9 +60,9 @@ function Navbar() {
             </Link>
 
             <Link
-              to="/attendance"
+              to="/presensi"
               className={`px-6 py-2.5 rounded-full font-medium transition-all ${
-                isActive("/attendance") ? activeClass : inactiveClass
+                isActive("/presensi") ? activeClass : inactiveClass
               }`}
             >
               Presensi
@@ -137,10 +137,10 @@ function Navbar() {
               Dashboard
             </Link>
             <Link
-              to="/attendance"
+              to="/presensi"
               onClick={() => setMobileMenuOpen(false)}
               className={`block px-6 py-3 rounded-full font-medium ${
-                isActive("/attendance") ? activeClass : "text-gray-700"
+                isActive("/presensi") ? activeClass : "text-gray-700"
               }`}
             >
               Presensi

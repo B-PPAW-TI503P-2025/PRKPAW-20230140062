@@ -75,7 +75,7 @@ function AttendancePage() {
       formData.append("image", blob, "selfie.jpg");
 
       const response = await axios.post(
-        "http://localhost:3001/api/attendance/check-in",
+        "http://localhost:3001/api/presensi/check-in",
 
         formData,
         { headers: { Authorization: `Bearer ${getToken()}` } }
@@ -97,7 +97,7 @@ function AttendancePage() {
         },
       };
       const response = await axios.post(
-        "http://localhost:3001/api/attendance/check-out",
+        "http://localhost:3001/api/presensi/check-out",
         {},
         config
       );

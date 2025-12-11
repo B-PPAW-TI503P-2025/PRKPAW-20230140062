@@ -13,6 +13,8 @@ router.post(
 
 router.post("/check-out", presensiController.CheckOut);
 
+router.get("/:id", presensiController.getPresensiById);
+
 router.put("/:id", presensiController.updatePresensi);
 
 router.delete("/:id", presensiController.hapusPresensi);

@@ -37,19 +37,43 @@ function ReportPage() {
     }
   };
 
+  // --- FUNGSI BARU: HAPUS DATA SECARA LANGSUNG ---
+  const handleDelete = async (id) => {
+    const token = localStorage.getItem("token");
+    if (!token || !window.confirm(`Apakah Anda yakin ingin menghapus catatan presensi ID ${id}?`)) {
+        return;
+    }
+
+    try {
+        await axios.delete(`http://localhost:3001/api/presensi/${id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        
+        // Refresh data setelah berhasil dihapus
+        fetchReports(searchTerm);
+        alert(`Catatan presensi ID ${id} berhasil dihapus.`);
+
+    } catch (err) {
+        setError(err.response ? err.response.data.message : "Gagal menghapus data.");
+    }
+  };
+  // --------------------------------------------------
+
   useEffect(() => {
     fetchReports("");
   }, [navigate]);
+  
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     fetchReports(searchTerm);
   };
 
+  // --- PERBAIKAN getImageUrl: Menggunakan versi paling sederhana (hanya nama file) ---
   const getImageUrl = (path) => {
     if (!path) return null;
-    // Ganti backslash (\) jadi slash (/) jika ada (untuk support path Windows)
-    const cleanPath = path.replace(/\\/g, "/");
-    return `http://localhost:3001/${cleanPath}`;
+    return `http://localhost:3001/uploads/${path}`;
   };
 
   return (
@@ -178,7 +202,7 @@ function ReportPage() {
                       <div>
                         <button
                           onClick={() =>
-                            navigate(`/edit-presensi/${presensi.id}`)
+                            navigate(`/edit-presensi/${presensi.id}`) // Rute navigasi Edit
                           }
                           className="text-green-600 hover:text-green-900 font-semibold"
                         >
@@ -187,9 +211,7 @@ function ReportPage() {
                       </div>
                       <div>
                         <button
-                          onClick={() =>
-                            navigate(`/delete-presensi/${presensi.id}`)
-                          }
+                          onClick={() => handleDelete(presensi.id)} // Panggil fungsi DELETE
                           className="text-red-600 hover:text-red-900 font-semibold"
                         >
                           Hapus Presensi
@@ -201,7 +223,7 @@ function ReportPage() {
               ) : (
                 <tr>
                   <td
-                    colSpan="3"
+                    colSpan="7"
                     className="px-6 py-4 text-center text-gray-500"
                   >
                     Tidak ada data yang ditemukan.

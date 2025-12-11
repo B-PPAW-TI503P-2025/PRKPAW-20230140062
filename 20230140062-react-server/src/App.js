@@ -7,7 +7,7 @@ import DashboardPage from './components/DashboardPage';
 import Navbar from './components/Navbar';
 import PresensiPage from './components/PresensiPage';
 import ReportPage from './components/ReportPage';
-
+import EditPresensiPage from './components/EditPresensiPage'; // <<< Tambahkan Import
 
 const isAuthenticated = () => {
     return localStorage.getItem('token');
@@ -40,6 +40,10 @@ function App() {
                     path="/reports" 
                     element={<ProtectedRoute element={ReportPage} />} 
                 /> 
+                <Route // <<< Tambahkan Rute Baru
+                    path="/edit-presensi/:id" 
+                    element={<ProtectedRoute element={EditPresensiPage} />} 
+                />
             </Routes>
         </Router>
     );

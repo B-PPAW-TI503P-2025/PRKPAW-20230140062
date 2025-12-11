@@ -31,7 +31,7 @@ exports.CheckIn = async (req, res) => {
 
     const { latitude, longitude } = req.body;
 
-    const buktiFoto = req.file ? req.file.path : null; //path foto
+    const buktiFoto = req.file ? req.file.filename : null; // DIVERSI BARU: Ambil hanya nama file
 
     const existingRecord = await Presensi.findOne({
       where: { userId: userId, checkOut: null },
@@ -97,6 +97,32 @@ exports.CheckOut = async (req, res) => {
   }
 };
 
+exports.getPresensiById = async (req, res) => {
+    try {
+        const presensiId = req.params.id;
+        const record = await Presensi.findByPk(presensiId, {
+            include: [
+                {
+                    model: User,
+                    as: "user",
+                    attributes: ["nama"],
+                },
+            ],
+        });
+
+        if (!record) {
+            return res.status(404).json({ message: "Catatan presensi tidak ditemukan." });
+        }
+
+        res.json({
+            message: "Detail presensi berhasil diambil.",
+            data: record,
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Terjadi kesalahan pada server", error: error.message });
+    }
+};
+
 exports.hapusPresensi = async (req, res) => {
   try {
     const { id: userId } = req.user;
@@ -145,7 +171,6 @@ exports.updatePresensi = async (req, res) => {
 
     recordToUpdate.checkIn = checkIn || recordToUpdate.checkIn;
     recordToUpdate.checkOut = checkOut || recordToUpdate.checkOut;
-    // recordToUpdate.nama = nama || recordToUpdate.nama;
 
     await recordToUpdate.save();
 

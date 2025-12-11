@@ -8,6 +8,7 @@ const presensiRoutes = require("./routes/presensi");
 const reportRoutes = require("./routes/reports");
 const authRoutes = require('./routes/auth');
 const path = require('path');
+const UPLOADS_DIR = path.join(__dirname, 'uploads');
  
  // Middleware
 app.use(cors());
@@ -24,6 +25,8 @@ app.use("/api/books", ruteBuku);
 app.use("/api/presensi", presensiRoutes);
 app.use("/api/reports", reportRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/uploads', express.static(UPLOADS_DIR));
+console.log('Akan menyajikan file statis dari direktori:', UPLOADS_DIR);
  
  app.listen(PORT, () => {
    console.log(`Express server running at http://localhost:${PORT}/`);
