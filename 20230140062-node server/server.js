@@ -9,6 +9,7 @@ const reportRoutes = require("./routes/reports");
 const authRoutes = require('./routes/auth');
 const path = require('path');
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
+const iotRoutes = require("./routes/iot");
  
  // Middleware
 app.use(cors());
@@ -45,3 +46,4 @@ app.use((err, req, res, next) => {
 });
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use("/api/iot", iotRoutes);
